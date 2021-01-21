@@ -8,11 +8,11 @@ repos:
       args: [--license-filepath, LICENSE]
       types: [python]
 - repo: https://github.com/asottile/setup-cfg-fmt
-  rev: v1.15.1
+  rev: v1.16.0
   hooks:
     - id: setup-cfg-fmt
 - repo: https://github.com/PyCQA/isort
-  rev: 5.6.4
+  rev: 5.7.0
   hooks:
     - id: isort
 - repo: https://github.com/myint/autoflake
@@ -95,7 +95,7 @@ repos:
         - flake8-tidy-imports
         - flake8-annotations-coverage
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v3.3.0
+  rev: v3.4.0
   hooks:
     - id: trailing-whitespace
     - id: mixed-line-ending
