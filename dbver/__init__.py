@@ -11,6 +11,67 @@
 # OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 # PERFORMANCE OF THIS SOFTWARE.
 
+"""dbver: simple sqlite3 schema version management.
+
+dbver is a set of utilities to support initializing, upgrading, and
+compatibility checking of sqlite3 database schemas.
+
+dbver is minimalist. It doesn't provide an ORM, or natively integrate with any.
+You provide your own schema migration code, and dbver helps you manage it.
+
+dbver only supports sqlite3. It doesn't provide any abstraction to work with
+other databases.
+
+dbver is meant to support implicit provisioning, where the database is created
+or upgraded implicitly by merely using an app. Explicit provisioning is also
+supported.
+
+dbver is meant for cases where:
+  1. Your app will only ever use sqlite3
+  2. Your app doesn't need an ORM
+  3. Your schema may still change over time
+
+dbver requires you to think about your database schema as an API. Your schema
+supports certain patterns of reads and writes. Changes to your schema may break
+those patterns, or they may be backward-compatible.
+
+Examples of backward-compatible changes:
+  * Adding a table
+  * Adding a non-unique index
+
+Examples of some "grey area" backward-compatible changes:
+  * Adding a column to the end of a table
+  * Changing a table to a view
+
+You will have to decide what compatibility means for your app. dbver doesn't
+expect or enforce specifics.
+
+dbver requires you to store an explicit schema version in the database, which
+must be updated during any migration.
+
+dbver allows for any DB-API 2.0 sqlite3 interface, including pysqlite3 and
+apsw.
+
+Some other considerations for sqlite3 schema compatibility:
+  * Always keep in mind which schema versions are supported by a version of
+    your app.
+  * If your app drops support for a schema version, that should be considered a
+    breaking change in the app (your app's version should change from 1.0.0 to
+    2.0.0).
+  * It's helpful to consider a new, un-provisioned database (no tables exist)
+    as being at a "null" version.
+  * It's helpful to consider readers (clients who only use SELECT) separately
+    from writers.
+  * A writer may implicitly migrate a schema (breaking or non-breaking); a
+    reader may not.
+  * If a writer does implicit migrations, they should normally be non-breaking.
+    An implicit breaking migration by the writer should be considered a
+    breaking change in the app, but an explicit (user-initiated) breaking
+    migration need not be considered a breaking change in the app.
+  * Readers should normally support a "null"-version database as being
+    equivalent to a provisioned database with empty tables. To avoid
+"""
+
 import abc
 import collections.abc
 import contextlib

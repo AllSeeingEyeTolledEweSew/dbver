@@ -1,0 +1,22 @@
+site_name: dbver
+site_description: minimalist toolkit for sqlite3
+
+theme:
+    name: readthedocs
+    # highlightjs is pinned to 10.5.0's github theme, which has poor results for python
+    highlightjs: false
+
+nav:
+    - index.md
+    - quickstart.md
+    - why.md
+    - compatibility.md
+    - api.md
+    - contributing.md
+
+markdown_extensions:
+    - admonition
+    - codehilite
+
+extra_css:
+    - css/pygmentize.css
