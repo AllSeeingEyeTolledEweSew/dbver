@@ -77,9 +77,7 @@ class BeginTest(unittest.TestCase):
                 self.conn.cursor().execute("insert into x (x) values (1)")
                 raise DummyException()
         self.assertFalse(self.conn.in_transaction)
-        self.assertEqual(
-            self.conn.cursor().execute("select * from x").fetchall(), []
-        )
+        self.assertEqual(self.conn.cursor().execute("select * from x").fetchall(), [])
 
     def test_deferred_success(self) -> None:
         self.do_success(dbver.LockMode.DEFERRED)
@@ -129,18 +127,14 @@ class BeginPoolTest(unittest.TestCase):
                 conn.cursor().execute("insert into x (x) values (1)")
                 raise DummyException()
         self.assertFalse(self.conn.in_transaction)
-        self.assertEqual(
-            self.conn.cursor().execute("select * from x").fetchall(), []
-        )
+        self.assertEqual(self.conn.cursor().execute("select * from x").fetchall(), [])
 
 
 class SemverBreakingTest(unittest.TestCase):
     def assert_breaking(
         self, breaking: bool, from_version: int, to_version: int
     ) -> None:
-        self.assertEqual(
-            dbver.semver_is_breaking(from_version, to_version), breaking
-        )
+        self.assertEqual(dbver.semver_is_breaking(from_version, to_version), breaking)
         if breaking:
             with self.assertRaises(dbver.VersionError):
                 dbver.semver_check_breaking(from_version, to_version)
@@ -173,18 +167,14 @@ class GetApplicationIdTest(unittest.TestCase):
     def test_get_zero(self) -> None:
         self.assertEqual(dbver.get_application_id(self.conn), 0)
         self.assertEqual(dbver.get_application_id(self.conn, "main"), 0)
-        self.assertEqual(
-            dbver.get_application_id(self.conn, "other schema"), 0
-        )
+        self.assertEqual(dbver.get_application_id(self.conn, "other schema"), 0)
 
     def test_get_after_set(self) -> None:
         self.conn.cursor().execute("pragma application_id = 1")
         self.conn.cursor().execute('pragma "other schema".application_id = 2')
         self.assertEqual(dbver.get_application_id(self.conn), 1)
         self.assertEqual(dbver.get_application_id(self.conn, "main"), 1)
-        self.assertEqual(
-            dbver.get_application_id(self.conn, "other schema"), 2
-        )
+        self.assertEqual(dbver.get_application_id(self.conn, "other schema"), 2)
 
 
 class SetApplicationIdTest(unittest.TestCase):
@@ -262,9 +252,7 @@ class SetUserVersionTest(unittest.TestCase):
 
         dbver.set_user_version(3, self.conn, "other schema")
         self.assertEqual(
-            self.conn.cursor()
-            .execute('pragma "other schema".user_version')
-            .fetchall(),
+            self.conn.cursor().execute('pragma "other schema".user_version').fetchall(),
             [(3,)],
         )
 
@@ -360,9 +348,7 @@ class NamedFormatMigrations(dbver.Migrations[Optional[str], dbver.Connection]):
         cur = conn.cursor()
         cur.execute(f'drop table if exists "{schema}".format')
         cur.execute(f'create table "{schema}".format (name text not null)')
-        cur.execute(
-            f'insert into "{schema}".format (name) values (?)', (new_format,)
-        )
+        cur.execute(f'insert into "{schema}".format (name) values (?)', (new_format,))
 
 
 class NamedFormatMigrationsTest(unittest.TestCase):
@@ -370,20 +356,12 @@ class NamedFormatMigrationsTest(unittest.TestCase):
         self.migrations = NamedFormatMigrations(application_id=1)
 
         @self.migrations.migrates(None, "A")
-        def migrate_null_a(
-            conn: dbver.Connection, schema: str = "main"
-        ) -> None:
-            conn.cursor().execute(
-                f'create table "{schema}".a (a int primary key)'
-            )
+        def migrate_null_a(conn: dbver.Connection, schema: str = "main") -> None:
+            conn.cursor().execute(f'create table "{schema}".a (a int primary key)')
 
         @self.migrations.migrates(None, "B")
-        def migrate_null_b(
-            conn: dbver.Connection, schema: str = "main"
-        ) -> None:
-            conn.cursor().execute(
-                f'create table "{schema}".b (b int primary key)'
-            )
+        def migrate_null_b(conn: dbver.Connection, schema: str = "main") -> None:
+            conn.cursor().execute(f'create table "{schema}".b (b int primary key)')
 
         @self.migrations.migrates("A", "B")
         def migrate_a_b(conn: dbver.Connection, schema: str = "main") -> None:
@@ -421,9 +399,7 @@ class NamedFormatMigrationsTest(unittest.TestCase):
     def test_unprovisioned(self) -> None:
         self.assertIsNone(self.migrations.get_format(self.conn))
         self.assertIsNone(self.migrations.get_format(self.conn, "main"))
-        self.assertIsNone(
-            self.migrations.get_format(self.conn, "other schema")
-        )
+        self.assertIsNone(self.migrations.get_format(self.conn, "other schema"))
 
     def test_invalid_application_id(self) -> None:
         self.conn.cursor().execute("pragma application_id = 2")
@@ -441,12 +417,8 @@ class NamedFormatMigrationsTest(unittest.TestCase):
         self.conn.cursor().execute("insert into a (a) values (?)", (1,))
 
         self.migrations[None]["A"](self.conn, "other schema")
-        self.assertEqual(
-            self.migrations.get_format(self.conn, "other schema"), "A"
-        )
-        self.conn.cursor().execute(
-            'insert into "other schema".a (a) values (?)', (1,)
-        )
+        self.assertEqual(self.migrations.get_format(self.conn, "other schema"), "A")
+        self.conn.cursor().execute('insert into "other schema".a (a) values (?)', (1,))
 
     def test_provision_b(self) -> None:
         self.migrations[None]["B"](self.conn, "main")
@@ -454,12 +426,8 @@ class NamedFormatMigrationsTest(unittest.TestCase):
         self.conn.cursor().execute("insert into b (b) values (?)", (1,))
 
         self.migrations[None]["B"](self.conn, "other schema")
-        self.assertEqual(
-            self.migrations.get_format(self.conn, "other schema"), "B"
-        )
-        self.conn.cursor().execute(
-            'insert into "other schema".b (b) values (?)', (1,)
-        )
+        self.assertEqual(self.migrations.get_format(self.conn, "other schema"), "B")
+        self.conn.cursor().execute('insert into "other schema".b (b) values (?)', (1,))
 
     def test_migrate_a_b(self) -> None:
         self.migrations[None]["A"](self.conn, "main")
@@ -472,15 +440,11 @@ class NamedFormatMigrationsTest(unittest.TestCase):
         self.assertEqual(cast(List[Tuple[int]], cur.fetchall()), [(1,)])
 
         self.migrations[None]["A"](self.conn, "other schema")
-        self.assertEqual(
-            self.migrations.get_format(self.conn, "other schema"), "A"
-        )
+        self.assertEqual(self.migrations.get_format(self.conn, "other schema"), "A")
         cur = self.conn.cursor()
         cur.execute('insert into "other schema".a (a) values (?)', (1,))
         self.migrations["A"]["B"](self.conn, "other schema")
-        self.assertEqual(
-            self.migrations.get_format(self.conn, "other schema"), "B"
-        )
+        self.assertEqual(self.migrations.get_format(self.conn, "other schema"), "B")
         cur.execute('select * from "other schema".b')
         self.assertEqual(cast(List[Tuple[int]], cur.fetchall()), [(1,)])
 
@@ -495,15 +459,11 @@ class NamedFormatMigrationsTest(unittest.TestCase):
         self.assertEqual(cast(List[Tuple[int]], cur.fetchall()), [(1,)])
 
         self.migrations[None]["B"](self.conn, "other schema")
-        self.assertEqual(
-            self.migrations.get_format(self.conn, "other schema"), "B"
-        )
+        self.assertEqual(self.migrations.get_format(self.conn, "other schema"), "B")
         cur = self.conn.cursor()
         cur.execute('insert into "other schema".b (b) values (?)', (1,))
         self.migrations["B"]["A"](self.conn, "other schema")
-        self.assertEqual(
-            self.migrations.get_format(self.conn, "other schema"), "A"
-        )
+        self.assertEqual(self.migrations.get_format(self.conn, "other schema"), "A")
         cur.execute('select * from "other schema".a')
         self.assertEqual(cast(List[Tuple[int]], cur.fetchall()), [(1,)])
 
@@ -516,17 +476,13 @@ class UserVersionMigrationsTest(unittest.TestCase):
 
         @self.migrations.migrates(0, 1)
         def migrate_0_1(conn: dbver.Connection, schema: str) -> None:
-            conn.cursor().execute(
-                f'create table "{schema}".a (a int primary key)'
-            )
+            conn.cursor().execute(f'create table "{schema}".a (a int primary key)')
 
         @self.migrations.migrates(1, 2)
         def migrate_1_2(conn: dbver.Connection, schema: str) -> None:
             cur = conn.cursor()
             cur.execute(f'create table "{schema}".a2 (a int primary key)')
-            cur.execute(
-                f'insert into "{schema}".a2 select * from "{schema}".a'
-            )
+            cur.execute(f'insert into "{schema}".a2 select * from "{schema}".a')
             cur.execute(f'drop table "{schema}".a')
 
         self.conn = _create_conn()
@@ -535,9 +491,7 @@ class UserVersionMigrationsTest(unittest.TestCase):
     def test_unprovisioned(self) -> None:
         self.assertEqual(self.migrations.get_format(self.conn), 0)
         self.assertEqual(self.migrations.get_format(self.conn, "main"), 0)
-        self.assertEqual(
-            self.migrations.get_format(self.conn, "other schema"), 0
-        )
+        self.assertEqual(self.migrations.get_format(self.conn, "other schema"), 0)
 
     def test_invalid_application_id(self) -> None:
         self.conn.cursor().execute("pragma application_id = 2")
@@ -556,9 +510,7 @@ class UserVersionMigrationsTest(unittest.TestCase):
 
         version = self.migrations.upgrade(self.conn, "other schema")
         self.assertEqual(version, 2)
-        self.assertEqual(
-            self.migrations.get_format(self.conn, "other schema"), 2
-        )
+        self.assertEqual(self.migrations.get_format(self.conn, "other schema"), 2)
 
     def test_upgrade_nonbreaking(self) -> None:
         self.migrations[0][1](self.conn, "main")
@@ -584,15 +536,11 @@ class UserVersionMigrationsTest(unittest.TestCase):
 
 class SemverMigrationsTest(unittest.TestCase):
     def setUp(self) -> None:
-        self.migrations = dbver.SemverMigrations[dbver.Connection](
-            application_id=1
-        )
+        self.migrations = dbver.SemverMigrations[dbver.Connection](application_id=1)
 
         @self.migrations.migrates(0, 1000000)
         def migrate_1(conn: dbver.Connection, schema: str) -> None:
-            conn.cursor().execute(
-                f'create table "{schema}".a (a int primary key)'
-            )
+            conn.cursor().execute(f'create table "{schema}".a (a int primary key)')
 
         @self.migrations.migrates(1000000, 1001000)
         def migrate_1dot1(conn: dbver.Connection, schema: str) -> None:
@@ -602,12 +550,8 @@ class SemverMigrationsTest(unittest.TestCase):
         @self.migrations.migrates(1001000, 2000000)
         def migrate_2(conn: dbver.Connection, schema: str) -> None:
             cur = conn.cursor()
-            cur.execute(
-                f'create table "{schema}".a2 (a int primary key, t text)'
-            )
-            cur.execute(
-                f'insert into "{schema}".a2 select * from "{schema}".a'
-            )
+            cur.execute(f'create table "{schema}".a2 (a int primary key, t text)')
+            cur.execute(f'insert into "{schema}".a2 select * from "{schema}".a')
             cur.execute(f'drop table "{schema}".a')
 
         self.conn = _create_conn()
@@ -616,9 +560,7 @@ class SemverMigrationsTest(unittest.TestCase):
     def test_unprovisioned(self) -> None:
         self.assertEqual(self.migrations.get_format(self.conn), 0)
         self.assertEqual(self.migrations.get_format(self.conn, "main"), 0)
-        self.assertEqual(
-            self.migrations.get_format(self.conn, "other schema"), 0
-        )
+        self.assertEqual(self.migrations.get_format(self.conn, "other schema"), 0)
 
     def test_invalid_application_id(self) -> None:
         self.conn.cursor().execute("pragma application_id = 2")
@@ -637,9 +579,7 @@ class SemverMigrationsTest(unittest.TestCase):
 
         version = self.migrations.upgrade(self.conn, "other schema")
         self.assertEqual(version, 2000000)
-        self.assertEqual(
-            self.migrations.get_format(self.conn, "other schema"), 2000000
-        )
+        self.assertEqual(self.migrations.get_format(self.conn, "other schema"), 2000000)
 
     def test_upgrade_nonbreaking(self) -> None:
         self.migrations[0][1000000](self.conn, "main")
