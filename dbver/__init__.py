@@ -201,9 +201,7 @@ def get_application_id(conn: _C, schema: str = "main") -> int:
     return application_id
 
 
-def set_application_id(
-    application_id: int, conn: _C, schema: str = "main"
-) -> None:
+def set_application_id(application_id: int, conn: _C, schema: str = "main") -> None:
     # sqlite doesn't support schema or pragma values as bind parameters.
     # we must do string-formatted sql, and check our inputs
     _check_schema(schema)
@@ -222,9 +220,7 @@ def get_user_version(conn: _C, schema: str = "main") -> int:
     return user_version
 
 
-def set_user_version(
-    user_version: int, conn: _C, schema: str = "main"
-) -> None:
+def set_user_version(user_version: int, conn: _C, schema: str = "main") -> None:
     # sqlite doesn't support schema or pragma values as bind parameters.
     # we must do string-formatted sql, and check our inputs
     _check_schema(schema)
@@ -238,23 +234,17 @@ def has_tables(conn: _C, schema: str = "main") -> bool:
     # we must do string-formatted sql, and check our inputs
     _check_schema(schema)
     cur = conn.cursor()
-    cur.execute(
-        f"select 1 from \"{schema}\".sqlite_master where type = 'table'"
-    )
+    cur.execute(f"select 1 from \"{schema}\".sqlite_master where type = 'table'")
     return cur.fetchone() is not None
 
 
-def check_application_id(
-    application_id: int, conn: _C, schema: str = "main"
-) -> None:
+def check_application_id(application_id: int, conn: _C, schema: str = "main") -> None:
     have_id = get_application_id(conn, schema=schema)
     if have_id == 0:
         if has_tables(conn, schema=schema):
             raise VersionError("database is not empty")
     elif have_id != application_id:
-        raise VersionError(
-            "wrong application_id: " f"{have_id} != {application_id}"
-        )
+        raise VersionError("wrong application_id: " f"{have_id} != {application_id}")
 
 
 Migration = Callable[[_C, str], None]
@@ -288,9 +278,7 @@ class Migrations(abc.ABC, collections.abc.Mapping, Generic[_T, _C]):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def set_format(
-        self, new_format: _T, conn: _C, schema: str = "main"
-    ) -> None:
+    def set_format(self, new_format: _T, conn: _C, schema: str = "main") -> None:
         if self._application_id != 0:
             set_application_id(self._application_id, conn, schema=schema)
 
@@ -369,9 +357,7 @@ class UserVersionMigrations(VersionMigrations[int, _C]):
     def get_format_unchecked(self, conn: _C, schema: str = "main") -> int:
         return get_user_version(conn, schema=schema)
 
-    def set_format(
-        self, new_format: int, conn: _C, schema: str = "main"
-    ) -> None:
+    def set_format(self, new_format: int, conn: _C, schema: str = "main") -> None:
         super().set_format(new_format, conn, schema=schema)
         set_user_version(new_format, conn, schema=schema)
 
