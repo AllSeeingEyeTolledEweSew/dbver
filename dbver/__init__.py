@@ -25,10 +25,9 @@ from typing import Dict
 from typing import Generic
 from typing import Iterator
 from typing import Mapping
+from typing import Protocol
 from typing import Tuple
 from typing import TypeVar
-
-from typing_extensions import Protocol
 
 # Support goals:
 #  - sqlite, not an abstraction layer
