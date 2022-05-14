@@ -17,5 +17,5 @@ jobs:
       - uses: pre-commit/action@v2.0.3
       - run: |
           pip install --upgrade pip
-          pip install tox
+          pip install tox tox-pipenv
       - run: tox
