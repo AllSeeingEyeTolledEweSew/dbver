@@ -89,10 +89,10 @@ _LOG = logging.getLogger(__name__)
 
 class Cursor(Protocol):
     def execute(self, sql: str) -> Any:
-        ...
+        ...  # pragma: no cover
 
     def fetchone(self) -> Tuple:
-        ...
+        ...  # pragma: no cover
 
 
 _Cu_co = TypeVar("_Cu_co", bound=Cursor, covariant=True)
@@ -100,10 +100,10 @@ _Cu_co = TypeVar("_Cu_co", bound=Cursor, covariant=True)
 
 class Connection(Protocol[_Cu_co]):
     def cursor(self) -> _Cu_co:
-        ...
+        ...  # pragma: no cover
 
     def close(self) -> Any:
-        ...
+        ...  # pragma: no cover
 
 
 _C = TypeVar("_C", bound=Connection)
@@ -274,7 +274,7 @@ class Migrations(abc.ABC, collections.abc.Mapping, Generic[_T, _C]):
 
     @abc.abstractmethod
     def get_format_unchecked(self, conn: _C, schema: str = "main") -> _T:
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     @abc.abstractmethod
     def set_format(self, new_format: _T, conn: _C, schema: str = "main") -> None:
@@ -304,7 +304,7 @@ class Migrations(abc.ABC, collections.abc.Mapping, Generic[_T, _C]):
 
 class _SupportsLessThan(Protocol):
     def __lt__(self, __other: Any) -> bool:
-        ...
+        ...  # pragma: no cover
 
 
 _LT = TypeVar("_LT", bound=_SupportsLessThan)
