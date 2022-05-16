@@ -42,6 +42,11 @@ repos:
         - pep8-naming
         - flake8-tidy-imports
         - flake8-annotations-coverage
+- repo: https://github.com/asottile/pyupgrade
+  rev: v2.32.1
+  hooks:
+    - id: pyupgrade
+      args: [--py38-plus]
 - repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v4.2.0
   hooks:
