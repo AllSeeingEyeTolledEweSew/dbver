@@ -17,6 +17,7 @@ import contextlib
 import enum
 import functools
 import logging
+import sqlite3
 from typing import Any
 from typing import Callable
 from typing import cast
@@ -27,6 +28,7 @@ from typing import Iterator
 from typing import Mapping
 from typing import Protocol
 from typing import Tuple
+from typing import Type
 from typing import TypeVar
 
 # Support goals:
@@ -85,6 +87,15 @@ from typing import TypeVar
 #  the database
 
 _LOG = logging.getLogger(__name__)
+
+Errors: Tuple[Type[Exception], ...] = (sqlite3.Error,)
+
+try:
+    import apsw
+except ImportError:
+    pass
+else:  # pragma: no cover
+    Errors = tuple(apsw.Error, *Errors)
 
 
 class Cursor(Protocol):
