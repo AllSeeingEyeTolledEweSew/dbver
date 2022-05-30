@@ -34,27 +34,6 @@ def _create_conn() -> sqlite3.Connection:
     return sqlite3.Connection(":memory:", isolation_level=None)
 
 
-class NullPoolTest(unittest.TestCase):
-    def test_close_normal(self) -> None:
-        singleton = _create_conn()
-        pool = dbver.null_pool(lambda: singleton)
-        with pool() as conn:
-            conn.cursor().execute("create table x (x int primary key)")
-        # Test the singleton was closed
-        with self.assertRaises(sqlite3.ProgrammingError):
-            singleton.cursor()
-
-    def test_close_fail(self) -> None:
-        singleton = sqlite3.Connection(":memory:")
-        pool = dbver.null_pool(lambda: singleton)
-        with self.assertRaises(DummyException):
-            with pool():
-                raise DummyException()
-        # Test the singleton was closed
-        with self.assertRaises(sqlite3.ProgrammingError):
-            singleton.cursor()
-
-
 class BeginTest(unittest.TestCase):
     def setUp(self) -> None:
         self.conn = _create_conn()
