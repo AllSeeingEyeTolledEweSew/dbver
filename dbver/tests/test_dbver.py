@@ -164,6 +164,12 @@ class GetApplicationIdTest(unittest.TestCase):
         self.conn = _create_conn()
         self.conn.cursor().execute("attach ':memory:' as ?", ("other schema",))
 
+    def test_invalid_schema(self) -> None:
+        with self.assertRaises(TypeError):
+            dbver.get_application_id(self.conn, 1)  # type: ignore
+        with self.assertRaises(ValueError):
+            dbver.get_application_id(self.conn, 'invalid"schema')
+
     def test_get_zero(self) -> None:
         self.assertEqual(dbver.get_application_id(self.conn), 0)
         self.assertEqual(dbver.get_application_id(self.conn, "main"), 0)
@@ -181,6 +187,12 @@ class SetApplicationIdTest(unittest.TestCase):
     def setUp(self) -> None:
         self.conn = _create_conn()
         self.conn.cursor().execute("attach ':memory:' as ?", ("other schema",))
+
+    def test_invalid_schema(self) -> None:
+        with self.assertRaises(TypeError):
+            dbver.set_application_id(1, self.conn, 1)  # type: ignore
+        with self.assertRaises(ValueError):
+            dbver.set_application_id(1, self.conn, 'invalid"schema')
 
     def test_set(self) -> None:
         dbver.set_application_id(1, self.conn)
@@ -219,6 +231,12 @@ class GetUserVersionTest(unittest.TestCase):
         self.conn = _create_conn()
         self.conn.cursor().execute("attach ':memory:' as ?", ("other schema",))
 
+    def test_invalid_schema(self) -> None:
+        with self.assertRaises(TypeError):
+            dbver.get_user_version(self.conn, 1)  # type: ignore
+        with self.assertRaises(ValueError):
+            dbver.get_user_version(self.conn, 'invalid"schema')
+
     def test_get_zero(self) -> None:
         self.assertEqual(dbver.get_user_version(self.conn), 0)
         self.assertEqual(dbver.get_user_version(self.conn, "main"), 0)
@@ -236,6 +254,12 @@ class SetUserVersionTest(unittest.TestCase):
     def setUp(self) -> None:
         self.conn = _create_conn()
         self.conn.cursor().execute("attach ':memory:' as ?", ("other schema",))
+
+    def test_invalid_schema(self) -> None:
+        with self.assertRaises(TypeError):
+            dbver.set_user_version(1, self.conn, 1)  # type: ignore
+        with self.assertRaises(ValueError):
+            dbver.set_user_version(1, self.conn, 'invalid"schema')
 
     def test_set(self) -> None:
         dbver.set_user_version(1, self.conn)
@@ -271,6 +295,12 @@ class CheckApplicationIdTest(unittest.TestCase):
     def setUp(self) -> None:
         self.conn = _create_conn()
         self.conn.cursor().execute("attach ':memory:' as ?", ("other schema",))
+
+    def test_invalid_schema(self) -> None:
+        with self.assertRaises(TypeError):
+            dbver.check_application_id(1, self.conn, 1)  # type: ignore
+        with self.assertRaises(ValueError):
+            dbver.check_application_id(1, self.conn, 'invalid"schema')
 
     def test_expected_empty(self) -> None:
         self.conn.cursor().execute("pragma application_id = 1")
