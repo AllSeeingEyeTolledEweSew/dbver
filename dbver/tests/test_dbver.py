@@ -535,6 +535,13 @@ class UserVersionMigrationsTest(unittest.TestCase):
         with self.assertRaises(dbver.VersionError):
             self.migrations.get_format(self.conn)
 
+    def test_invalid_version_progression(self) -> None:
+        with self.assertRaises(AssertionError):
+
+            @self.migrations.migrates(2, 1)
+            def migrate_backward(conn: dbver.Connection, schema: str) -> None:
+                pass  # pragma: no cover
+
     def test_nonempty_db(self) -> None:
         self.conn.cursor().execute("create table x (x int primary key)")
         with self.assertRaises(dbver.VersionError):
@@ -603,6 +610,13 @@ class SemverMigrationsTest(unittest.TestCase):
         self.conn.cursor().execute("pragma application_id = 2")
         with self.assertRaises(dbver.VersionError):
             self.migrations.get_format(self.conn)
+
+    def test_invalid_version_progression(self) -> None:
+        with self.assertRaises(AssertionError):
+
+            @self.migrations.migrates(2, 1)
+            def migrate_backward(conn: dbver.Connection, schema: str) -> None:
+                pass  # pragma: no cover
 
     def test_nonempty_db(self) -> None:
         self.conn.cursor().execute("create table x (x int primary key)")
