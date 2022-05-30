@@ -11,6 +11,7 @@
 # OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 # PERFORMANCE OF THIS SOFTWARE.
 
+import collections
 import contextlib
 import sqlite3
 from typing import cast
@@ -425,6 +426,12 @@ class NamedFormatMigrationsTest(unittest.TestCase):
         self.assert_migration_map(self.migrations["B"], {"A"})
 
         self.assertEqual(self.migrations.get("does_not_exist"), None)
+
+        self.assertEqual(len(self.migrations), 3)
+        self.assertEqual(
+            collections.Counter(iter(self.migrations)),
+            collections.Counter((None, "A", "B")),
+        )
 
     def test_unprovisioned(self) -> None:
         self.assertIsNone(self.migrations.get_format(self.conn))
