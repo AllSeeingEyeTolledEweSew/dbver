@@ -143,7 +143,7 @@ class LockMode(str, enum.Enum):
 @contextlib.contextmanager
 def begin(conn: _C, lock_mode: LockMode) -> Iterator[None]:
     cur = conn.cursor()
-    cur.execute(f"begin {lock_mode}")
+    cur.execute(f"begin {lock_mode.value}")
     try:
         yield
     except Exception:
