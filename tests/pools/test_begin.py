@@ -20,11 +20,7 @@ class DummyException(Exception):
     pass
 
 
-LOCK_MODES = (
-    dbver.LockMode.DEFERRED,
-    dbver.LockMode.IMMEDIATE,
-    dbver.LockMode.EXCLUSIVE,
-)
+LOCK_MODES = (dbver.DEFERRED, dbver.IMMEDIATE, dbver.EXCLUSIVE)
 
 
 def check_in_transaction(conn: dbver.Connection, in_transaction: bool) -> None:

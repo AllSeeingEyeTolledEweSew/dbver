@@ -140,6 +140,11 @@ class LockMode(str, enum.Enum):
     EXCLUSIVE = "exclusive"
 
 
+IMMEDIATE = LockMode.IMMEDIATE
+DEFERRED = LockMode.DEFERRED
+EXCLUSIVE = LockMode.EXCLUSIVE
+
+
 @contextlib.contextmanager
 def begin(conn: _C, lock_mode: LockMode) -> Iterator[None]:
     cur = conn.cursor()
