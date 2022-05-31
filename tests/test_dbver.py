@@ -34,50 +34,6 @@ def _create_conn() -> sqlite3.Connection:
     return sqlite3.Connection(":memory:", isolation_level=None)
 
 
-class BeginTest(unittest.TestCase):
-    def setUp(self) -> None:
-        self.conn = _create_conn()
-        self.conn.cursor().execute("create table x (x int primary key)")
-
-    def do_success(self, lock_mode: dbver.LockMode) -> None:
-        self.assertFalse(self.conn.in_transaction)
-        with dbver.begin(self.conn, lock_mode):
-            self.assertTrue(self.conn.in_transaction)
-            self.conn.cursor().execute("insert into x (x) values (1)")
-        self.assertFalse(self.conn.in_transaction)
-        self.assertEqual(
-            self.conn.cursor().execute("select * from x").fetchall(), [(1,)]
-        )
-
-    def do_fail(self, lock_mode: dbver.LockMode) -> None:
-        self.assertFalse(self.conn.in_transaction)
-        with self.assertRaises(DummyException):
-            with dbver.begin(self.conn, lock_mode):
-                self.assertTrue(self.conn.in_transaction)
-                self.conn.cursor().execute("insert into x (x) values (1)")
-                raise DummyException()
-        self.assertFalse(self.conn.in_transaction)
-        self.assertEqual(self.conn.cursor().execute("select * from x").fetchall(), [])
-
-    def test_deferred_success(self) -> None:
-        self.do_success(dbver.LockMode.DEFERRED)
-
-    def test_deferred_fail(self) -> None:
-        self.do_fail(dbver.LockMode.DEFERRED)
-
-    def test_immediate_success(self) -> None:
-        self.do_success(dbver.LockMode.IMMEDIATE)
-
-    def test_immediate_fail(self) -> None:
-        self.do_fail(dbver.LockMode.IMMEDIATE)
-
-    def test_exclusive_success(self) -> None:
-        self.do_success(dbver.LockMode.EXCLUSIVE)
-
-    def test_exclusive_fail(self) -> None:
-        self.do_fail(dbver.LockMode.EXCLUSIVE)
-
-
 class BeginPoolTest(unittest.TestCase):
     def setUp(self) -> None:
         self.conn = _create_conn()
