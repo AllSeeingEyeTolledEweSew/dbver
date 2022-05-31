@@ -28,49 +28,6 @@ def _create_conn() -> sqlite3.Connection:
     return sqlite3.Connection(":memory:", isolation_level=None)
 
 
-class SetApplicationIdTest(unittest.TestCase):
-    def setUp(self) -> None:
-        self.conn = _create_conn()
-        self.conn.cursor().execute("attach ':memory:' as ?", ("other schema",))
-
-    def test_invalid_schema(self) -> None:
-        with self.assertRaises(TypeError):
-            dbver.set_application_id(1, self.conn, 1)  # type: ignore
-        with self.assertRaises(ValueError):
-            dbver.set_application_id(1, self.conn, 'invalid"schema')
-
-    def test_set(self) -> None:
-        dbver.set_application_id(1, self.conn)
-        self.assertEqual(
-            self.conn.cursor().execute("pragma application_id").fetchall(),
-            [(1,)],
-        )
-
-        dbver.set_application_id(2, self.conn, "main")
-        self.assertEqual(
-            self.conn.cursor().execute("pragma application_id").fetchall(),
-            [(2,)],
-        )
-
-        dbver.set_application_id(3, self.conn, "other schema")
-        self.assertEqual(
-            self.conn.cursor()
-            .execute('pragma "other schema".application_id')
-            .fetchall(),
-            [(3,)],
-        )
-
-    def test_set_invalid(self) -> None:
-        with self.assertRaises(ValueError):
-            dbver.set_application_id(1 << 40, self.conn)
-
-        with self.assertRaises(ValueError):
-            dbver.set_application_id(-(1 << 40), self.conn)
-
-        with self.assertRaises(TypeError):
-            dbver.set_application_id("str", self.conn)  # type: ignore
-
-
 class GetUserVersionTest(unittest.TestCase):
     def setUp(self) -> None:
         self.conn = _create_conn()
