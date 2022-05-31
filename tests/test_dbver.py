@@ -28,30 +28,6 @@ def _create_conn() -> sqlite3.Connection:
     return sqlite3.Connection(":memory:", isolation_level=None)
 
 
-class GetApplicationIdTest(unittest.TestCase):
-    def setUp(self) -> None:
-        self.conn = _create_conn()
-        self.conn.cursor().execute("attach ':memory:' as ?", ("other schema",))
-
-    def test_invalid_schema(self) -> None:
-        with self.assertRaises(TypeError):
-            dbver.get_application_id(self.conn, 1)  # type: ignore
-        with self.assertRaises(ValueError):
-            dbver.get_application_id(self.conn, 'invalid"schema')
-
-    def test_get_zero(self) -> None:
-        self.assertEqual(dbver.get_application_id(self.conn), 0)
-        self.assertEqual(dbver.get_application_id(self.conn, "main"), 0)
-        self.assertEqual(dbver.get_application_id(self.conn, "other schema"), 0)
-
-    def test_get_after_set(self) -> None:
-        self.conn.cursor().execute("pragma application_id = 1")
-        self.conn.cursor().execute('pragma "other schema".application_id = 2')
-        self.assertEqual(dbver.get_application_id(self.conn), 1)
-        self.assertEqual(dbver.get_application_id(self.conn, "main"), 1)
-        self.assertEqual(dbver.get_application_id(self.conn, "other schema"), 2)
-
-
 class SetApplicationIdTest(unittest.TestCase):
     def setUp(self) -> None:
         self.conn = _create_conn()
