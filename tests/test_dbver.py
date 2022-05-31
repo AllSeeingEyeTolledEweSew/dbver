@@ -12,11 +12,9 @@
 # PERFORMANCE OF THIS SOFTWARE.
 
 import collections
-import contextlib
 import sqlite3
 from typing import cast
 from typing import Collection
-from typing import Iterator
 from typing import List
 from typing import Mapping
 from typing import Optional
@@ -26,44 +24,8 @@ import unittest
 import dbver
 
 
-class DummyException(Exception):
-    pass
-
-
 def _create_conn() -> sqlite3.Connection:
     return sqlite3.Connection(":memory:", isolation_level=None)
-
-
-class BeginPoolTest(unittest.TestCase):
-    def setUp(self) -> None:
-        self.conn = _create_conn()
-        self.conn.cursor().execute("create table x (x int primary key)")
-
-        @contextlib.contextmanager
-        def null_pool() -> Iterator[sqlite3.Connection]:
-            yield self.conn
-
-        self.pool = null_pool
-
-    def test_success(self) -> None:
-        self.assertFalse(self.conn.in_transaction)
-        with dbver.begin_pool(self.pool, dbver.LockMode.DEFERRED) as conn:
-            self.assertTrue(self.conn.in_transaction)
-            conn.cursor().execute("insert into x (x) values (1)")
-        self.assertFalse(self.conn.in_transaction)
-        self.assertEqual(
-            self.conn.cursor().execute("select * from x").fetchall(), [(1,)]
-        )
-
-    def test_fail(self) -> None:
-        self.assertFalse(self.conn.in_transaction)
-        with self.assertRaises(DummyException):
-            with dbver.begin_pool(self.pool, dbver.LockMode.DEFERRED) as conn:
-                self.assertTrue(self.conn.in_transaction)
-                conn.cursor().execute("insert into x (x) values (1)")
-                raise DummyException()
-        self.assertFalse(self.conn.in_transaction)
-        self.assertEqual(self.conn.cursor().execute("select * from x").fetchall(), [])
 
 
 class SemverBreakingTest(unittest.TestCase):
