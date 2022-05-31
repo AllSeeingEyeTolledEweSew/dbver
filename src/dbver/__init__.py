@@ -155,10 +155,13 @@ def begin(conn: _C, lock_mode: LockMode) -> Iterator[None]:
         # Per https://sqlite.org/lang_transaction.html : some errors may cause
         # an automatic rollback; we should always explicitly rollback and
         # ignore any errors.
-        # Currently not ignoring errors, because different adapters use
-        # different exception hierarchies. We could try-import a few well-known
-        # types though.
-        cur.execute("rollback")
+        try:
+            cur.execute("rollback")
+        except Errors:
+            # Ideally we'd narrow this exception match
+            _LOG.exception(
+                "error during rollback ignored, presuming automatic rollback happened"
+            )
         raise
     else:
         cur.execute("commit")
