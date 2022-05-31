@@ -28,35 +28,6 @@ def _create_conn() -> sqlite3.Connection:
     return sqlite3.Connection(":memory:", isolation_level=None)
 
 
-class SemverBreakingTest(unittest.TestCase):
-    def assert_breaking(
-        self, breaking: bool, from_version: int, to_version: int
-    ) -> None:
-        self.assertEqual(dbver.semver_is_breaking(from_version, to_version), breaking)
-        if breaking:
-            with self.assertRaises(dbver.VersionError):
-                dbver.semver_check_breaking(from_version, to_version)
-        else:
-            dbver.semver_check_breaking(from_version, to_version)
-
-    def test_zero_nonbreaking(self) -> None:
-        self.assert_breaking(False, 0, 2000000)
-        self.assert_breaking(False, 0, 0)
-
-    def test_backward_breaking(self) -> None:
-        self.assert_breaking(True, 2000000, 0)
-        self.assert_breaking(True, 1001000, 1000000)
-
-    def test_forward_breaking(self) -> None:
-        self.assert_breaking(True, 1000000, 2000000)
-        self.assert_breaking(True, 1999999, 2000000)
-
-    def test_forward_nonbreaking(self) -> None:
-        self.assert_breaking(False, 1000000, 1000001)
-        self.assert_breaking(False, 1000000, 1001000)
-        self.assert_breaking(False, 1000000, 1999999)
-
-
 class GetApplicationIdTest(unittest.TestCase):
     def setUp(self) -> None:
         self.conn = _create_conn()
