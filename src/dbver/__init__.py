@@ -348,7 +348,7 @@ class VersionMigrations(Migrations[_LT, _C]):
         schema: str = "main",
         *,
         condition: Callable[[_LT, _LT], Any] = None,
-        breaking=False,
+        breaking: bool = False,
     ) -> _LT:
         if condition is None:
 
