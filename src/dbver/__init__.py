@@ -94,8 +94,8 @@ try:
     import apsw
 except ImportError:
     pass
-else:  # pragma: no cover
-    Errors = tuple(apsw.Error, *Errors)
+else:
+    Errors = (apsw.Error, *Errors)
 
 
 class Cursor(Protocol):

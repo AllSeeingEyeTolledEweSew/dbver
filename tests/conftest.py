@@ -19,11 +19,33 @@ import pytest
 
 import dbver
 
+try:
+    import apsw
+except ImportError:
+    # https://github.com/python/mypy/issues/1153
+    apsw = None  # type: ignore
 
-# TODO: also use apsw
-@pytest.fixture
-def conn_factory() -> Callable[[], dbver.Connection]:
+
+def _conn_factory_sqlite() -> Callable[[], dbver.Connection]:
     return functools.partial(sqlite3.connect, ":memory:", isolation_level=None)
+
+
+def _conn_factory_apsw() -> Callable[[], dbver.Connection]:
+    return functools.partial(apsw.Connection, ":memory:")
+
+
+@pytest.fixture(
+    params=(
+        _conn_factory_sqlite,
+        pytest.param(
+            _conn_factory_apsw,
+            marks=pytest.mark.skipif(not apsw, reason="apsw not used"),
+        ),
+    ),
+    ids=("sqlite", "apsw"),
+)
+def conn_factory(request: pytest.FixtureRequest) -> Callable[[], dbver.Connection]:
+    return request.param()  # type: ignore
 
 
 @pytest.fixture
