@@ -2,13 +2,13 @@
 # See https://pre-commit.com/hooks.html for more hooks
 repos:
 - repo: https://github.com/Lucas-C/pre-commit-hooks
-  rev: v1.3.0
+  rev: v1.3.1
   hooks:
     - id: insert-license
       args: [--license-filepath, LICENSE]
       types: [python]
 - repo: https://github.com/asottile/setup-cfg-fmt
-  rev: v1.20.2
+  rev: v2.0.0
   hooks:
     - id: setup-cfg-fmt
 - repo: https://github.com/PyCQA/isort
@@ -38,7 +38,7 @@ repos:
         # keep this part in sync with tests/test-requirements.txt
         - pytest>=7,<8
 - repo: https://github.com/pycqa/flake8
-  rev: 4.0.1
+  rev: 5.0.4
   hooks:
     - id: flake8
       additional_dependencies:
