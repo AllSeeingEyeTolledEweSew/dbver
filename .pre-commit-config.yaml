@@ -65,7 +65,7 @@ repos:
         - flake8-tidy-imports
         - flake8-annotations-coverage
 - repo: https://github.com/asottile/pyupgrade
-  rev: v2.38.2
+  rev: v3.0.0
   hooks:
     - id: pyupgrade
       args: [--py38-plus]
